@@ -1,39 +1,52 @@
-import React, { Component } from "react";
-import "./todo-list-item.css";
+import React, { Component } from 'react';
+import './todo-list-item.css';
+import { formatDistanceToNow } from 'date-fns';
+import classNames from 'classnames';
 
 export default class TodoListItem extends Component {
   state = {
-    edit: false,
-    сompleted: false,
+    date: new Date(),
   };
-  onLabelClick = () => {
-    this.setState((state) => {
-      return {
-        completed: !state.completed,
-      };
-    });
+
+  componentDidMount() {
+    this.timerID = setInterval(() => this.tick(), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+  tick() {
+    this.setState({});
+  }
+
+  _handleKeyPress = e => {
+    if (e.key === 'Enter') {
+      console.log('do validate');
+    }
   };
 
   render() {
-    const { label, onDeleted } = this.props;
-    const { edit = false, completed } = this.state;
-    let classNames = "description";
-    if (completed) {
-      classNames += " description-line";
-    }
+    const { label, onDeleted, onToggleDone, done, isEditing } = this.props;
+    const { date } = this.state;
 
     return (
       <div className="view">
-        <input className="toggle" type="checkbox" onClick={this.onLabelClick} />
+        <input className="toggle" type="checkbox" tabIndex={-1} />
         <label>
-          <span className={classNames}>{label}</span>
-          <span className="created">created 5 minutes ago</span>
+          <span
+            className={classNames('description', { 'description-line': done })}
+            onClick={onToggleDone}
+            onKeyPress={this._handleKeyPress}
+          >
+            {label}
+          </span>
+          <span className="created" tabIndex={-1}>
+            {formatDistanceToNow(date, { includeSeconds: true })}
+          </span>
         </label>
-        <button className="icon icon-edit"></button>
-        <button
-          className="icon icon-destroy"
-          onClick={this.props.onDeleted}
-        ></button>
+        <button className="icon icon-edit" tabIndex={-1} onClick={isEditing}></button>
+        <button className="icon icon-destroy" onClick={onDeleted} tabIndex={-1}></button>
       </div>
     );
   }
